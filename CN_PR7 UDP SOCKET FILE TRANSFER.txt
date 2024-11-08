@@ -1,0 +1,66 @@
+##(client)
+
+import socket
+import os
+
+def send_file_udp(server_ip, server_port, file_path):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Check if file exists
+    if not os.path.exists(file_path):
+        print(f"File '{file_path}' does not exist.")
+        return
+
+    with open(file_path, 'rb') as file:
+        chunk_size = 1024  # Define the size of the chunks
+        while True:
+            # Read a chunk from the file
+            chunk = file.read(chunk_size)
+
+            # If we've reached the end of the file, break the loop
+            if not chunk:
+                break
+
+            # Send the chunk to the server
+            client_socket.sendto(chunk, (server_ip, server_port))
+
+        # Send an "END" signal to indicate the file is fully transferred
+        client_socket.sendto(b'END', (server_ip, server_port))
+
+    client_socket.close()
+
+if __name__ == '__main__':
+    # Replace with the server's IP address
+    server_ip = '127.0.0.1'
+    server_port = 12345
+    file_path = 'file_to_send.txt'
+
+    send_file_udp(server_ip, server_port, file_path)
+
+##(server)
+
+import socket
+
+def start_udp_server(port, output_filename):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_socket.bind(('0.0.0.0', port))  # Bind to all interfaces
+
+    print(f"Server listening on port {port}...")
+
+    with open(output_filename, 'wb') as file:
+        while True:
+            # Receive data
+            data, addr = server_socket.recvfrom(1024)  # Buffer size of 1024 bytes
+
+            # If we receive a special message indicating the end of file transfer, we break
+            if data == b'END':
+                print("File transfer complete.")
+                break
+
+            # Write the received chunk to the file
+            file.write(data)
+
+    server_socket.close()
+
+if __name__ == '__main__':
+    start_udp_server(12345, 'received_file.txt')

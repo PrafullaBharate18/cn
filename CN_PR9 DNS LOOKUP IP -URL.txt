@@ -1,0 +1,28 @@
+import socket
+
+def get_host_info_by_name(hostname):
+    try:
+        address = socket.gethostbyname(hostname)
+        print(f"IP address: {address}")
+        print(f"Host name : {hostname}")
+        print(f"Host name and IP address: {hostname} - {address}")
+    except socket.gaierror:
+        print(f"Could not find {hostname}")
+
+def get_host_info_by_ip(ip_address):
+    try:
+        hostname = socket.gethostbyaddr(ip_address)[0]
+        print(f"Host name : {hostname}")
+        print(f"IP address: {ip_address}")
+        print(f"Host name and IP address: {hostname} - {ip_address}")
+    except socket.herror:
+        print(f"Could not find {ip_address}")
+
+if __name__ == "__main__":
+    choice = int(input("1.Enter Host Name \n2.Enter IP address \nChoice="))
+    if choice == 1:
+        host = input("\nEnter host name: ")
+        get_host_info_by_name(host)
+    else:
+        host = input("\nEnter IP address: ")
+        get_host_info_by_ip(host)

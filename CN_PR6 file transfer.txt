@@ -1,0 +1,47 @@
+##(server)
+import socket
+
+def start_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('127.0.0.1', 5000))
+    server_socket.listen(10)
+    print("Socket retrieve success, listening...")
+
+    while True:
+        conn, addr = server_socket.accept()
+        print(f"Connection from {addr} has been established!")
+
+        with open("sample_file.txt", "rb") as file:
+            while True:
+                data = file.read(256)
+                if not data:
+                    break
+                conn.sendall(data)
+
+        conn.close()
+        print("Data sent successfully, connection closed.")
+        
+if __name__ == "__main__":
+    start_server()
+
+
+##(client)
+import socket
+
+def start_client():
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('127.0.0.1', 5000))
+    
+    with open("received_file.txt", "wb") as file:
+        while True:
+            data = client_socket.recv(256)
+            if not data:
+                break
+            file.write(data)
+            print(f"Bytes received: {len(data)}")
+    
+    client_socket.close()
+    print("File received successfully and connection closed.")
+
+if __name__ == "__main__":
+    start_client()

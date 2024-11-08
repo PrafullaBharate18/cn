@@ -1,0 +1,45 @@
+import socket
+
+
+def get_subnet_info(ip):
+    ip_parts = list(map(int, ip.split('.')))
+    cc = ip_parts[0]
+
+    mask = ''
+    if cc > 0 and cc <= 127:
+        mask = '255.0.0.0'
+        print("Class A IP Address")
+    elif cc >= 128 and cc <= 191:
+        mask = '255.255.0.0'
+        print("Class B IP Address")
+    elif cc >= 192 and cc <= 223:
+        mask = '255.255.255.0'
+        print("Class C IP Address")
+    elif cc >= 224 and cc <= 239:
+        mask = '255.0.0.0'
+        print("Class D IP Address Used for multicasting")
+    elif cc >= 240 and cc <= 254:
+        mask = '255.0.0.0'
+        print("Class E IP Address Experimental Use")
+
+    print("SUBNET MASK:\n" + mask)
+
+    network_addr = []
+    last_addr = []
+    mask_parts = list(map(int, mask.split('.')))
+
+    for i in range(4):
+        x = ip_parts[i]
+        y = mask_parts[i]
+        z = x & y
+        network_addr.append(str(z))
+        w = z | (y ^ 255)
+        last_addr.append(str(w))
+
+    print("First IP of block: " + '.'.join(network_addr))
+    print("Last IP of block: " + '.'.join(last_addr))
+
+
+if __name__ == "__main__":
+    ip = input("ENTER IP: ")
+    get_subnet_info(ip)
